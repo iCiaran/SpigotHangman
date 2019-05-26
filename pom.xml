@@ -12,9 +12,10 @@
     <description>Hangman plugin for spigot servers</description>
 
     <properties>
-        <author>Ciaran Moran</author>
+        <author>iCiaran</author>
         <mainClass>uk.co.ciaranmoran.hangman.Hangman</mainClass>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <apiVersion>1.14</apiVersion>
     </properties>
 
     <repositories>

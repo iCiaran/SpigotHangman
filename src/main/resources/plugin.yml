@@ -3,7 +3,12 @@ version: ${version}
 description: ${description}
 author: ${author}
 
-
 main: ${mainClass}
 
 permissions: {}
+api-version: ${apiVersion}
+
+commands:
+  hangman:
+    description: Hangman game
+    usage: /hangman [start/status/guess]
