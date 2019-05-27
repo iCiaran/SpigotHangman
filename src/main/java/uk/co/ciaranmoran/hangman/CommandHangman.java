@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+
 import java.util.Arrays;
 
 public class CommandHangman implements CommandExecutor {
@@ -13,16 +14,16 @@ public class CommandHangman implements CommandExecutor {
             case "start":
                 return start(commandSender, args);
             case "status":
-                return status(commandSender, args);
+                return status(commandSender);
             case "stop":
-                return stop(commandSender, args);
+                return stop(commandSender);
             case "guess":
                 return guess(commandSender, args);
         }
         return false;
     }
 
-    public boolean start(CommandSender commandSender, String[] args) {
+    private boolean start(CommandSender commandSender, String[] args) {
         if (Game.getInstance().isInProgress()) {
             commandSender.sendMessage("There is already a game in progress");
         } else if (args.length < 2) {
@@ -35,18 +36,25 @@ public class CommandHangman implements CommandExecutor {
         return true;
     }
 
-    public boolean status(CommandSender commandSender, String[] args) {
-        commandSender.sendMessage("Game in progress: " + Game.getInstance().isInProgress());
+    private boolean status(CommandSender commandSender) {
+        boolean inProgress = Game.getInstance().isInProgress();
+        commandSender.sendMessage("Game in progress: " + inProgress);
+        if (inProgress) {
+            commandSender.sendMessage("Hint: " + Game.getInstance().getCensored());
+            commandSender.sendMessage("Guessed: " + Game.getInstance().getGuessed());
+            commandSender.sendMessage("Guesses remaining: " + Game.getInstance().getRemaining());
+        }
         return true;
     }
 
-    public boolean stop(CommandSender commandSender, String[] args) {
+    private boolean stop(CommandSender commandSender) {
         Game.getInstance().stopGame();
+        commandSender.sendMessage("Stopping Game!");
         return true;
     }
 
-    public boolean guess(CommandSender commandSender, String[] args) {
-        Game.getInstance().makeGuess(args[1]);
+    private boolean guess(CommandSender commandSender, String[] args) {
+        Game.getInstance().makeGuess(commandSender, args[1]);
         return true;
     }
 
