@@ -6,7 +6,7 @@
 
     <groupId>uk.co.ciaranmoran</groupId>
     <artifactId>Hangman</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.14.2_1</version>
 
     <name>Hangman</name>
     <description>Hangman plugin for spigot servers</description>
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.14.1-R0.1-SNAPSHOT</version>
+            <version>1.14.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
