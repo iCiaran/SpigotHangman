@@ -11,4 +11,16 @@ api-version: ${apiVersion}
 commands:
   hangman:
     description: Hangman game
-    usage: /hangman [start/status/guess]
+    usage: /hangman [start/guess/status/stop]
+  hangman start:
+    description: Start a game
+    usage: /hangman start <word>
+  hangman guess:
+    description: Make a guess
+    usage: /hangman guess <letter/word>
+  hangman status:
+    description: Get the status of the current game
+    usage: /hangman status
+  hangman stop:
+    description: Stops the current game
+    usage: /hangman stop

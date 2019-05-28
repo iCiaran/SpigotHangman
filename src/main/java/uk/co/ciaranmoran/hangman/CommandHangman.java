@@ -10,6 +10,9 @@ import java.util.Arrays;
 public class CommandHangman implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+        if (args.length == 0) {
+            return false;
+        }
         switch (args[0]) {
             case "start":
                 return start(commandSender, args);
@@ -28,6 +31,7 @@ public class CommandHangman implements CommandExecutor {
             commandSender.sendMessage("There is already a game in progress");
         } else if (args.length < 2) {
             commandSender.sendMessage("Usage: /hangman start <word>");
+            return false;
         } else {
             Game.getInstance().startGame(StringUtils.join(Arrays.copyOfRange(args, 1, args.length), " "));
             commandSender.sendMessage("Game Started!");
@@ -54,6 +58,10 @@ public class CommandHangman implements CommandExecutor {
     }
 
     private boolean guess(CommandSender commandSender, String[] args) {
+        if(args.length < 2) {
+            commandSender.sendMessage("Usage: /hangman guess <letter/word>");
+            return false;
+        }
         Game.getInstance().makeGuess(commandSender, args[1]);
         return true;
     }
