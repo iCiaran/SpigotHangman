@@ -1,6 +1,7 @@
 package uk.co.ciaranmoran.hangman;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,6 +14,7 @@ class Game {
     private ArrayList<Character> word;
     private ArrayList<Character> censored;
     private int numberFailed;
+    private Set<CommandSender> players;
 
     private final int MAX_GUESSES = 10;
 
@@ -37,23 +39,25 @@ class Game {
         return inProgress;
     }
 
-    String getCensored() {
+    private String getCensored() {
         return this.censored.toString();
     }
 
-    String getGuessed() {
+    private String getGuessed() {
         return this.guesses.toString();
     }
 
-    int getRemaining() {
+    private int getRemaining() {
         return this.MAX_GUESSES - this.numberFailed;
     }
 
-    void startGame(String s) {
-
+    void startGame(CommandSender commandSender, String s) {
         this.guesses = new HashSet<>();
         this.censored = new ArrayList<>();
         this.word = new ArrayList<>();
+        this.players = new HashSet<>();
+
+        this.addToPlayers(commandSender);
 
         this.numberFailed = 0;
 
@@ -67,23 +71,35 @@ class Game {
                 this.censored.add('/');
             }
         }
+
         this.setInProgress(true);
     }
 
-    void stopGame() {
+    private void stopGame() {
         this.setInProgress(false);
     }
 
-    void makeGuess(CommandSender commandSender, String s) {
+    void stop() {
+        this.sendToAll("Stopping the game");
+        this.stopGame();
+    }
 
+    private void addToPlayers(CommandSender commandSender) {
+        if (commandSender instanceof Player) {
+            this.players.add(commandSender);
+        }
+    }
+
+    void makeGuess(CommandSender commandSender, String s) {
+        this.addToPlayers(commandSender);
         if (!this.isInProgress()) {
-            commandSender.sendMessage("There isn't a game in progress right now!");
+            this.sendMessage(commandSender, "There isn't a game in progress right now!");
             return;
         }
 
-        if (s.length() == 1 ) {
-            if(!Character.isAlphabetic(s.charAt(0))){
-                commandSender.sendMessage("You must guess a letter!");
+        if (s.length() == 1) {
+            if (!Character.isAlphabetic(s.charAt(0))) {
+                this.sendMessage(commandSender, "You must guess a letter!");
                 return;
             }
             this.guessLetter(commandSender, Character.toLowerCase(s.charAt(0)));
@@ -92,12 +108,12 @@ class Game {
         }
 
         if (this.checkLose()) {
-            commandSender.sendMessage("Game Over!");
+            this.sendToAll("Game Over!");
             this.stopGame();
         }
 
         if (this.checkWin()) {
-            commandSender.sendMessage("Congratulations You Won!");
+            this.sendToAll("Congratulations You Won!");
             this.stopGame();
         }
     }
@@ -116,8 +132,9 @@ class Game {
     }
 
     private void guessLetter(CommandSender commandSender, char c) {
+
         if (this.guesses.contains(c)) {
-            commandSender.sendMessage("That letter has already been guessed!");
+            this.sendMessage(commandSender, "That letter has already been guessed!");
             return;
         }
 
@@ -133,16 +150,44 @@ class Game {
         }
 
         if (found) {
-            commandSender.sendMessage("Well done, the word is now: ");
-            commandSender.sendMessage(this.getCensored());
+            this.sendToAll(commandSender.getName() + " correctly guessed the letter: " + c + "!");
         } else {
-            commandSender.sendMessage("Letter " + c + " was not found!");
+            this.sendToAll(commandSender.getName() + " guessed: " + c + ", but it wasn't found!");
             this.numberFailed++;
         }
+        this.sendToAll(this.getStatus());
     }
 
     private void guessWord(CommandSender commandSender, String s) {
-        commandSender.sendMessage("Guessing whole words is not implemented yet, oops!");
+        this.sendMessage(commandSender, "Guessing whole words is not implemented yet, oops!");
         //TODO
     }
+
+    private void sendToAll(String message) {
+        for (CommandSender commandSender : players) {
+            this.sendMessage(commandSender, message);
+        }
+    }
+
+    private void sendToAll(String[] messages) {
+        for (String message : messages) {
+            sendToAll(message);
+        }
+    }
+
+    String[] getStatus() {
+        if (!this.isInProgress()) {
+            return new String[]{"There is no game in progress right now!"};
+        } else {
+            return new String[]{"Phrase: " + Game.getInstance().getCensored(),
+                    "Guessed: " + Game.getInstance().getGuessed(),
+                    "Guesses remaining: " + Game.getInstance().getRemaining()};
+        }
+    }
+
+    private void sendMessage(CommandSender commandSender, String message) {
+        String prefix = "[Hangman] ";
+        commandSender.sendMessage(prefix + message);
+    }
+
 }

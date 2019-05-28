@@ -24,3 +24,6 @@ commands:
   hangman stop:
     description: Stops the current game
     usage: /hangman stop
+  hangman source:
+    description: Get link to github repo
+    usage: /hangman source

@@ -10,9 +10,11 @@ import java.util.Arrays;
 public class CommandHangman implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String label, String[] args) {
+
         if (args.length == 0) {
             return false;
         }
+        
         switch (args[0]) {
             case "start":
                 return start(commandSender, args);
@@ -22,6 +24,8 @@ public class CommandHangman implements CommandExecutor {
                 return stop(commandSender);
             case "guess":
                 return guess(commandSender, args);
+            case "source":
+                return source(commandSender);
         }
         return false;
     }
@@ -30,39 +34,36 @@ public class CommandHangman implements CommandExecutor {
         if (Game.getInstance().isInProgress()) {
             commandSender.sendMessage("There is already a game in progress");
         } else if (args.length < 2) {
-            commandSender.sendMessage("Usage: /hangman start <word>");
             return false;
         } else {
-            Game.getInstance().startGame(StringUtils.join(Arrays.copyOfRange(args, 1, args.length), " "));
-            commandSender.sendMessage("Game Started!");
+            Game.getInstance().startGame(commandSender, StringUtils.join(Arrays.copyOfRange(args, 1, args.length), " "));
+            commandSender.getServer().broadcastMessage("[Hangman] " + commandSender.getName() + " has started a game of hangman!");
         }
 
         return true;
     }
 
     private boolean status(CommandSender commandSender) {
-        boolean inProgress = Game.getInstance().isInProgress();
-        commandSender.sendMessage("Game in progress: " + inProgress);
-        if (inProgress) {
-            commandSender.sendMessage("Hint: " + Game.getInstance().getCensored());
-            commandSender.sendMessage("Guessed: " + Game.getInstance().getGuessed());
-            commandSender.sendMessage("Guesses remaining: " + Game.getInstance().getRemaining());
-        }
+        commandSender.sendMessage(Game.getInstance().getStatus());
         return true;
     }
 
     private boolean stop(CommandSender commandSender) {
-        Game.getInstance().stopGame();
-        commandSender.sendMessage("Stopping Game!");
+        Game.getInstance().stop();
+        commandSender.sendMessage("You have stopped the game.");
         return true;
     }
 
     private boolean guess(CommandSender commandSender, String[] args) {
-        if(args.length < 2) {
-            commandSender.sendMessage("Usage: /hangman guess <letter/word>");
+        if (args.length < 2) {
             return false;
         }
         Game.getInstance().makeGuess(commandSender, args[1]);
+        return true;
+    }
+
+    private boolean source(CommandSender commandSender) {
+        commandSender.sendMessage("https://github.com/iCiaran/SpigotHangman");
         return true;
     }
 
